@@ -6,6 +6,9 @@
 
 #define square(x)  ((x)*(x))
 
+#define prob1
+
+#ifdef prob2
 float objective(int const *x)
 {
 
@@ -25,7 +28,24 @@ float objective(int const *x)
 	return (float)(term1);
 
 }
+#endif
 
+#ifdef prob1
+float objective(int const *x)
+{
+
+	float term1, term2, term3;
+	float g, penalty_coef;
+
+	//if (x == NULL) error_ptr_null("x in objective()");
+
+
+	term1 = (float)(square(x[0]) + square(x[1]));
+	
+	return (float)( 1/ term1);
+
+}
+#endif
 
 
 int main(int argc, _TCHAR* argv[])

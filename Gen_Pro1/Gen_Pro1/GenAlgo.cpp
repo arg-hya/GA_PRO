@@ -76,7 +76,7 @@ GenAlgo::~GenAlgo()
 bool GenAlgo::InputParams()
 {
 	std::cout << "\nHow many generations ? ------------- : ";
-	nGEN = 50;
+	nGEN = 35;
 	//std::cin >> nGEN;
 
 	
@@ -341,7 +341,7 @@ float GenAlgo::CalculateFitness(INDIVIDUAL const &individual)
 	rslt =  Objfunc(x);
 	if (x)
 	{
-		delete x;
+		delete[] x;
 		x = NULL;
 	}
 
@@ -355,7 +355,7 @@ float GenAlgo::CalculateFitness(INDIVIDUAL const &individual)
 ///
 /// \return		Returns decoded string
 ///
-/// \remarks	Binary to BCD conversion.
+/// \remarks	Binary to BCD conversion. [LSB...MSB]
 /*************************************************************************/
 int GenAlgo::DecodeString(char * fChromo, const int i)
 {
@@ -363,7 +363,7 @@ int GenAlgo::DecodeString(char * fChromo, const int i)
 
 	for (int j = (lenChromo_var * i); j < ((lenChromo_var * i) + lenChromo_var); j++)
 	{
-		result |= (fChromo[j] == 1) << j;
+		result |= (fChromo[j] == 1) << (j - (lenChromo_var * i));
 	}
 	
 	return result;
