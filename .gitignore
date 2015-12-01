@@ -19,3 +19,10 @@ Gen_Pro1/Gen_Pro1.sln
 Gen_Pro1/Gen_Pro1/Debug/Gen_Pro1.pch.codeanalysisast
 *.tlog
 Gen_Pro1/Gen_Pro1/Debug/vc140.idb
+*.vcxproj
+Gen_Pro1/Gen_Pro1/Debug/GEN.ilk
+*.exe
+Gen_Pro1/Gen_Pro1/GEN.v12.suo
+*.sln
+Gen_Pro1/Gen_Pro1/Debug/vc120.idb
+*.opensdf

@@ -6,7 +6,7 @@
 
 #define square(x)  ((x)*(x))
 
-#define prob1
+#define prob2
 
 #ifdef prob2
 float objective(int const *x)
