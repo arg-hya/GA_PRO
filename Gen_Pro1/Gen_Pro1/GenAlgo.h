@@ -32,7 +32,8 @@ private:
 			nGEN,						//Number of Generations to be run.
 			nPOPU,						//Population size.
 		   *lenChromo_var,				//Chromosome length of each variable.
-			lenChromo_tot;				//Chromosome length of each individual :: (nVAR * lenChromo_var).				
+			lenChromo_tot,				//Chromosome length of each individual :: (nVAR * lenChromo_var).
+		    func_num;
 			//indx_f,						//Index of one parent.
 			//indx_m;					    //Index of another parent.
 
@@ -64,7 +65,7 @@ private:
 	bool IdentifyChilds(INDIVIDUAL const & child1, INDIVIDUAL const & child2, const int indx_f, const int indx_m, int const indx);
 	bool CopyPopulation(int gen_no);
 
-	int DecodeString(char * fChromo , const int i);
+	double DecodeString(char * fChromo , const int i);
 	int largestPowerOf2(const unsigned int n);
 
 	bool ShowPopu();
@@ -76,6 +77,8 @@ public:
 	unsigned int Fitness_Calculations;				//Number of fittness calculations performed
 	GenAlgo();
 	~GenAlgo();
-	bool Run();
-	Fitness(*Objfunc)(const int *);
+	bool Run(const int func_no);
+	Fitness(*Objfunc)(const double *);
+
+	void (*test_func)(double *, double *, int, int, int);
 };

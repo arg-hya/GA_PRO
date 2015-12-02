@@ -86,12 +86,12 @@ GenAlgo::~GenAlgo()
 /*************************************************************************/
 bool GenAlgo::InputParams()
 {
-	std::cout << "\nHow many generations ? ------------- : ";
-	nGEN = 25;
+	/*std::cout << "\nHow many generations ? ------------- : ";*/
+	nGEN = 51;
 	//std::cin >> nGEN;
 
 	
-	std::cout << "\nPopulation Size ? ------------------ : ";	
+	/*std::cout << "\nPopulation Size ? ------------------ : ";	*/
 	nPOPU = 100;
 	//std::cin >> nPOPU;
 	
@@ -101,12 +101,12 @@ bool GenAlgo::InputParams()
 		exit(EXIT_FAILURE);
 	}
 
-	std::cout << "\nCross Over Probability ? ( 0 to 1 )  : ";	
-	//std::cin >> Pc;
-	std::cout << "\nMutation Probability ? ( 0 to 1 ) -- : ";	
-	//std::cin >> Pm;
-	std::cout << "\nNumber of variables (Maximum %d) ---- : " << MAXVECSIZE;
-	nVAR = 2;
+	//std::cout << "\nCross Over Probability ? ( 0 to 1 )  : ";	
+	////std::cin >> Pc;
+	//std::cout << "\nMutation Probability ? ( 0 to 1 ) -- : ";	
+	////std::cin >> Pm;
+	//std::cout << "\nNumber of variables (Maximum %d) ---- : " << MAXVECSIZE;
+	nVAR = 10;
 	//std::cin >> nVAR;
 
 	LW_BND = new float[nVAR];
@@ -115,7 +115,7 @@ bool GenAlgo::InputParams()
 	/**NOTE: Bounds are considered Rigid.*/
 	for (int k = 0; k < nVAR; k++)
 	{
-		std::cout << "\nLower and Upper bounds of x[%d] ----- : ", k + 1;
+		/*std::cout << "\nLower and Upper bounds of x[%d] ----- : ", k + 1;*/
 		LW_BND[k] = -100;
 		HG_BND[k] =  100;
 	//	std::cin >> LW_BND[k];
@@ -124,7 +124,7 @@ bool GenAlgo::InputParams()
 
 	lenChromo_var = new int[nVAR];
 
-	std::cout << "\n Calculating Total string length (each variable has equal string length)?";	
+	/*std::cout << "\n Calculating Total string length (each variable has equal string length)";	*/
 	for (int k = 0; k < nVAR; k++)
 	{		
 		lenChromo_var[k] = largestPowerOf2(HG_BND[k] - LW_BND[k]);
@@ -357,7 +357,7 @@ bool GenAlgo::CopyPopulation(int gen_no)
 /*************************************************************************/
 GenAlgo::Fitness GenAlgo::CalculateFitness(INDIVIDUAL const &individual)
 {
-	int *x = new int[nVAR],
+	double *x = new double[nVAR],
 		result = 0;
 	Fitness rslt;
 
@@ -368,8 +368,9 @@ GenAlgo::Fitness GenAlgo::CalculateFitness(INDIVIDUAL const &individual)
 	
 	//exit(EXIT_FAILURE);
 		
-	
-	rslt =  Objfunc(x);
+	test_func(x, &rslt, nVAR, 1, func_num);
+
+	//rslt =  Objfunc(x);
 	if (x)
 	{
 		delete[] x;
@@ -388,14 +389,15 @@ GenAlgo::Fitness GenAlgo::CalculateFitness(INDIVIDUAL const &individual)
 ///
 /// \remarks	Binary to BCD conversion. [LSB...MSB]
 /*************************************************************************/
-int GenAlgo::DecodeString(char * fChromo, const int i)
+double GenAlgo::DecodeString(char * fChromo, const int i)
 {
-	int result = 0,
+	int temp = 0,
 		start = 0,
 		end = 0,
 		var_highest = (int)pow(2, lenChromo_var[i]);
 
-	double coff;
+	double coff,
+		   result = 0.0 ;
 
 	for (int k = 0; k < i; k++)	start += lenChromo_var[k];
 		
@@ -404,20 +406,20 @@ int GenAlgo::DecodeString(char * fChromo, const int i)
 
 		for (int j = start; j < end; j++)
 	{
-		result |= (fChromo[j] == 1) << (j - start);
+			temp |= (fChromo[j] == 1) << (j - start);
 	}
 	
 	///*NOTE:: Boundary conditions are taken care here and ONLY here.*/
-		if (false)
-		{
-			coff = (double)(result / (double)var_highest);
-			result = (int)(LW_BND[i] + coff * (HG_BND[i] - LW_BND[i]));
-		}
-
 		if (true)
 		{
+			coff = (double)(temp / (double)var_highest);
+			result = LW_BND[i] + coff * (HG_BND[i] - LW_BND[i]);
+		}
+
+		if (false)
+		{
 			UNREFERENCED_PARAMETER(var_highest);
-			result = result % (unsigned int)(HG_BND[i] - LW_BND[i]);
+			result = (double)(temp % (unsigned int)(HG_BND[i] - LW_BND[i]));
 			result = result - ((HG_BND[i] - LW_BND[i]) / 2);
 		}
 
@@ -465,7 +467,7 @@ int GenAlgo::largestPowerOf2(const unsigned int n)
 /// \remarks	This function takes the parameters required from the user
 ///             returns true if everything goes well, otherwise returns false.
 /*************************************************************************/
-bool GenAlgo::Run()
+bool GenAlgo::Run(const int func_no)
 {
 
 	int nPopu,
@@ -473,6 +475,8 @@ bool GenAlgo::Run()
 		indx_f = 0,				//Index of one parent.	
 		indx_m = 0;				//Index of another parent.
 	bool rslt;		
+
+	func_num = func_no;
 
 	/*INPUT PARAMETERS FROM USER*/
 	rslt = InputParams();
@@ -482,13 +486,14 @@ bool GenAlgo::Run()
 
 	/*INITIALIZE THE 0TH GEN POPULATION*/
 	Initialize(); 
+	Fitness_Calculations += nPOPU;
 
 	do
 	{		
 		CHILDREN child1, child2;	//This are used to store the children temporaryly
 		nPopu = nPOPU;	
 
-		ShowPopu();
+		//ShowPopu();
 
 		if (Fitness_Calculations > MaxFitness_Calculations)	break;		//Maximum number of fittness calculations has occured.
 
@@ -513,6 +518,7 @@ bool GenAlgo::Run()
 			/*CALCULATE FITNESS OF OFFSPRINGS*/
 			child1.fFitness = CalculateFitness(child1);	
 			child2.fFitness = CalculateFitness(child2);
+			Fitness_Calculations += 2;
 
 			/*IDENTIFY GOOD CHILDS AND STORE THEM*/
 			IdentifyChilds(child1, child2, indx_f, indx_m, nPopu);
@@ -528,13 +534,15 @@ bool GenAlgo::Run()
 		/*UPDATE NEW GEN POPULATION*/
 		CopyPopulation(nGEN - totGen);
 
+		std::cout << "\nGen no :: " << nGEN - totGen << std::endl;
+		std::cout << "**************" << std::endl;
+		ShowDude();
+
 	} while (--totGen);
 
 	ShowStatistics();
 
-	ShowDude();	
-
-	getchar();
+	//ShowDude();		
 
 return true;
 }
@@ -554,7 +562,7 @@ bool GenAlgo::ShowStatistics()
 	std_best_fitness /= nGEN;
 	std_best_fitness = sqrt(std_best_fitness);
 
-	std::cout << "Mean = " << mean_best_fitness << std::endl;
+	std::cout << "\nMean = " << mean_best_fitness << std::endl;
 	std::cout << "std = " << std_best_fitness << std::endl;
 
 	return SUCCESS;
@@ -562,10 +570,10 @@ bool GenAlgo::ShowStatistics()
 
 bool GenAlgo::ShowIndividual(INDIVIDUAL const &individual)
 {
-	for (int j = 0; j < nVAR; j++)
+	/*for (int j = 0; j < nVAR; j++)
 	{
 		std::cout << "Var " << j << " : " << DecodeString(individual.fChromo, j) << " " << std::endl;
-	}
+	}*/
 	std::cout << "Fittness : " << individual.fFitness << std::endl;
 	return SUCCESS;
 }
@@ -579,7 +587,7 @@ bool GenAlgo::ShowDude()
 		if (POPU[i].fFitness > POPU[max_fit_indx].fFitness)	max_fit_indx = i;
 	}
 
-	std::cout << "\n\n\nDude is : " << std::endl;
+	std::cout << "\nDude is : " << std::endl;
 	ShowIndividual(POPU[max_fit_indx]);
 	
 	return SUCCESS;
