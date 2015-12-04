@@ -75,6 +75,7 @@ private:
 
 public:
 	unsigned int Fitness_Calculations;				//Number of fittness calculations performed
+	bool Minimizing_prob;							//Is this a minimizing problem
 	GenAlgo();
 	~GenAlgo();
 	bool Run(const int func_no);

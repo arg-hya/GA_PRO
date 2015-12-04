@@ -59,11 +59,13 @@ int main(int argc, _TCHAR* argv[])
 	for (int i = 0; i < 28; i++)
 	{
 		std::cout << "************ Function number: " << i + 1 << " ************" << std::endl;
-		GenAlgo *a = new GenAlgo();
+		GenAlgo *a = new GenAlgo();		
 
 		a->test_func = test_func;		//Passes the objective function	
 
-		a->Run(i);			//Runs it
+		a->Minimizing_prob = true;		//Mentioning this is a minimizing prob
+
+		a->Run(i+1);			//Runs it
 
 		a->~GenAlgo();		//Delete it
 	}

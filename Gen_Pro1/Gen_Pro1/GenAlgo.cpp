@@ -15,6 +15,8 @@ GenAlgo::GenAlgo()
 {	
 	srand((unsigned int)time(NULL));	// initialize random seed
 
+	Minimizing_prob = false;
+
 }
 
 /*************************************************************************/
@@ -87,7 +89,7 @@ GenAlgo::~GenAlgo()
 bool GenAlgo::InputParams()
 {
 	/*std::cout << "\nHow many generations ? ------------- : ";*/
-	nGEN = 51;
+	nGEN = 100;
 	//std::cin >> nGEN;
 
 	
@@ -106,7 +108,7 @@ bool GenAlgo::InputParams()
 	//std::cout << "\nMutation Probability ? ( 0 to 1 ) -- : ";	
 	////std::cin >> Pm;
 	//std::cout << "\nNumber of variables (Maximum %d) ---- : " << MAXVECSIZE;
-	nVAR = 10;
+	nVAR = 2;
 	//std::cin >> nVAR;
 
 	LW_BND = new float[nVAR];
@@ -377,6 +379,8 @@ GenAlgo::Fitness GenAlgo::CalculateFitness(INDIVIDUAL const &individual)
 		x = NULL;
 	}
 
+	rslt = (Minimizing_prob) ? (-1 * rslt) : rslt;
+
 	return rslt;
 }
 
@@ -542,7 +546,7 @@ bool GenAlgo::Run(const int func_no)
 
 	ShowStatistics();
 
-	//ShowDude();		
+	ShowDude();		
 
 return true;
 }
@@ -570,10 +574,10 @@ bool GenAlgo::ShowStatistics()
 
 bool GenAlgo::ShowIndividual(INDIVIDUAL const &individual)
 {
-	/*for (int j = 0; j < nVAR; j++)
+	for (int j = 0; j < nVAR; j++)
 	{
 		std::cout << "Var " << j << " : " << DecodeString(individual.fChromo, j) << " " << std::endl;
-	}*/
+	}
 	std::cout << "Fittness : " << individual.fFitness << std::endl;
 	return SUCCESS;
 }
