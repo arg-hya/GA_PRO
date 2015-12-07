@@ -89,7 +89,7 @@ GenAlgo::~GenAlgo()
 bool GenAlgo::InputParams()
 {
 	/*std::cout << "\nHow many generations ? ------------- : ";*/
-	nGEN = 100;
+	nGEN = 51;
 	//std::cin >> nGEN;
 
 	
@@ -108,7 +108,7 @@ bool GenAlgo::InputParams()
 	//std::cout << "\nMutation Probability ? ( 0 to 1 ) -- : ";	
 	////std::cin >> Pm;
 	//std::cout << "\nNumber of variables (Maximum %d) ---- : " << MAXVECSIZE;
-	nVAR = 2;
+	nVAR = 10;
 	//std::cin >> nVAR;
 
 	LW_BND = new float[nVAR];
@@ -278,37 +278,52 @@ bool GenAlgo::MutateChildren(INDIVIDUAL & child)
 bool GenAlgo::IdentifyChilds(INDIVIDUAL const & child1, INDIVIDUAL const & child2,
 							 const int indx_f, const int indx_m, int const indx)
 {
+	int i;
 	/*For Child 1*/
-	if ((child1.fFitness >= POPU[indx_f].fFitness) || (child1.fFitness >= POPU[indx_m].fFitness))
+	if (BetterFit(child1.fFitness, POPU[indx_f].fFitness) || BetterFit(child1.fFitness, POPU[indx_m].fFitness))
 	{
-		for (int i = 0; i < lenChromo_tot; i++)
+		for (i = 0; i < lenChromo_tot; i++)
 			Temp_popu[indx].fChromo[i] = child1.fChromo[i];
 
 		Temp_popu[indx].fFitness = child1.fFitness;
 	}
-	else if ((POPU[indx_f].fFitness >= POPU[indx_m].fFitness))
+	else if (BetterFit(POPU[indx_f].fFitness, POPU[indx_m].fFitness))
 	{
-		for (int i = 0; i < lenChromo_tot; i++)
+		for (i = 0; i < lenChromo_tot; i++)
 			Temp_popu[indx].fChromo[i] = POPU[indx_f].fChromo[i];
 
 		Temp_popu[indx].fFitness = POPU[indx_f].fFitness;
 	}
-		
+	else
+	{
+		for (i = 0; i < lenChromo_tot; i++)
+			Temp_popu[indx].fChromo[i] = POPU[indx_m].fChromo[i];
+
+		Temp_popu[indx].fFitness = POPU[indx_m].fFitness;
+	}
+
 
 	/*For Child 2*/
-	if ((child2.fFitness >= POPU[indx_f].fFitness) || (child2.fFitness >= POPU[indx_m].fFitness))
+	if (BetterFit(child2.fFitness, POPU[indx_f].fFitness) || BetterFit(child2.fFitness, POPU[indx_m].fFitness))
 	{
-		for (int i = 0; i < lenChromo_tot; i++)
+		for (i = 0; i < lenChromo_tot; i++)
 			Temp_popu[indx + 1].fChromo[i] = child2.fChromo[i];
 
 		Temp_popu[indx + 1].fFitness = child2.fFitness;
 	}
-	else if ((POPU[indx_m].fFitness >= POPU[indx_f].fFitness))
+	else if (BetterFit(POPU[indx_m].fFitness, POPU[indx_f].fFitness))
 	{
-		for (int i = 0; i < lenChromo_tot; i++)
+		for (i = 0; i < lenChromo_tot; i++)
 			Temp_popu[indx + 1].fChromo[i] = POPU[indx_m].fChromo[i];
 
 		Temp_popu[indx + 1].fFitness = POPU[indx_m].fFitness;
+	}
+	else
+	{
+		for (i = 0; i < lenChromo_tot; i++)
+			Temp_popu[indx + 1].fChromo[i] = POPU[indx_f].fChromo[i];
+
+		Temp_popu[indx + 1].fFitness = POPU[indx_f].fFitness;
 	}
 
 	return SUCCESS;
@@ -342,7 +357,7 @@ bool GenAlgo::CopyPopulation(int gen_no)
 	/*Stores the best fitness level achieved in this generation in best_fitness_array[].*/
 	for (int i = 0; i < nPOPU; i++)
 	{
-		if (POPU[i].fFitness > POPU[max_fit_indx].fFitness)	max_fit_indx = i;
+		if (BetterFit(POPU[i].fFitness, POPU[max_fit_indx].fFitness))	max_fit_indx = i;
 	}
 	best_fitness_array[gen_no] = POPU[max_fit_indx].fFitness;
 	return SUCCESS;
@@ -462,6 +477,29 @@ int GenAlgo::largestPowerOf2(const unsigned int n)
 }
 
 /*************************************************************************/
+/// <b>Function: BetterFit</b>
+///
+/// \param  
+///
+/// \return		Returns true/false
+///
+/// \remarks	Returns the better fitt candidate. fit_target is compared with fit_base
+/*************************************************************************/
+bool GenAlgo::BetterFit(const double fit_target, const double fit_base)
+{
+	if (Minimizing_prob)
+	{
+		if (fit_target <= fit_base)	return true;
+		else return false;
+	}
+	else
+	{
+		if (fit_target >= fit_base)	return true;
+		else return false;
+	}
+}
+
+/*************************************************************************/
 /// <b>Function: Run</b>
 ///
 /// \param  
@@ -553,6 +591,8 @@ return true;
 
 bool GenAlgo::ShowStatistics()
 {
+	mean_best_fitness = std_best_fitness = 0.0;
+
 	for (int j = 0; j < nGEN; j++) {
 		mean_best_fitness += best_fitness_array[j];
 	}
@@ -560,7 +600,7 @@ bool GenAlgo::ShowStatistics()
 	mean_best_fitness /= nGEN;
 
 	for (int j = 0; j < nGEN; j++) {
-		std_best_fitness += pow((mean_best_fitness - best_fitness_array[j]), 2.0);
+		std_best_fitness += square(mean_best_fitness - best_fitness_array[j]);
 	}
 
 	std_best_fitness /= nGEN;
@@ -588,7 +628,7 @@ bool GenAlgo::ShowDude()
 
 	for (int i = 0; i < nPOPU; i++)
 	{
-		if (POPU[i].fFitness > POPU[max_fit_indx].fFitness)	max_fit_indx = i;
+		if (BetterFit(POPU[i].fFitness, POPU[max_fit_indx].fFitness))	max_fit_indx = i;
 	}
 
 	std::cout << "\nDude is : " << std::endl;

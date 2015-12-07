@@ -67,6 +67,7 @@ private:
 
 	double DecodeString(char * fChromo , const int i);
 	int largestPowerOf2(const unsigned int n);
+	bool BetterFit(const double fit_target, const double fit_base);
 
 	bool ShowPopu();
 	bool ShowDude();

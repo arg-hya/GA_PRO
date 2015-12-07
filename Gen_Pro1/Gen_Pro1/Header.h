@@ -8,6 +8,7 @@
 #define MINPOPSIZE	2
 
 #define RANDOM(min, max)  min + rand() % (max - min + 1) //range : [min, max] . Seeding done in constructor.
+#define square(x)  ((x)*(x))
 #define UNREFERENCED_PARAMETER(P) (P)
 
 
