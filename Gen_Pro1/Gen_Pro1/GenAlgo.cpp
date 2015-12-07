@@ -394,7 +394,7 @@ GenAlgo::Fitness GenAlgo::CalculateFitness(INDIVIDUAL const &individual)
 		x = NULL;
 	}
 
-	rslt = (Minimizing_prob) ? (-1 * rslt) : rslt;
+	//rslt = (Minimizing_prob) ? (-1 * rslt) : rslt;
 
 	return rslt;
 }
@@ -563,7 +563,7 @@ bool GenAlgo::Run(const int func_no)
 			Fitness_Calculations += 2;
 
 			/*IDENTIFY GOOD CHILDS AND STORE THEM*/
-			IdentifyChilds(child1, child2, indx_f, indx_m, nPopu);
+			IdentifyChilds(child1, child2, indx_f, indx_m, nPOPU - nPopu - 2);
 
 
 			/*cleaning up*/
